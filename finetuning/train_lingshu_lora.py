@@ -362,12 +362,23 @@ def main():
 
     logger.info(f"Loading model: {args.model_id}")
     dtype = torch.float16 if args.dtype == "float16" else torch.bfloat16
-    model = Qwen2_5_VLForConditionalGeneration.from_pretrained(
-        args.model_id,
-        torch_dtype=dtype,
-        device_map="auto",
-        attn_implementation="flash_attention_2",
-    )
+    # Try flash_attention_2 if available, fall back to sdpa
+    try:
+        model = Qwen2_5_VLForConditionalGeneration.from_pretrained(
+            args.model_id,
+            torch_dtype=dtype,
+            device_map="auto",
+            attn_implementation="flash_attention_2",
+        )
+        logger.info("Using flash_attention_2")
+    except (ImportError, ValueError):
+        model = Qwen2_5_VLForConditionalGeneration.from_pretrained(
+            args.model_id,
+            torch_dtype=dtype,
+            device_map="auto",
+            attn_implementation="sdpa",
+        )
+        logger.info("flash_attention_2 not available, using sdpa")
     processor = AutoProcessor.from_pretrained(args.model_id, use_fast=True)
 
     # Ensure pad token

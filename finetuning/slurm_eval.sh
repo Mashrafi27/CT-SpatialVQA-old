@@ -4,7 +4,7 @@
 #SBATCH --gres=gpu:1
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=64G
-#SBATCH --time=12:00:00
+#SBATCH --time=08:00:00
 #SBATCH --output=logs/eval_%j.out
 #SBATCH --error=logs/eval_%j.err
 
@@ -14,10 +14,12 @@ NPZ_ROOT="/l/users/mashrafi.monon/MICCAI2026-3DMedVLMS/3D_VLM_Spatial/preprocess
 # ────────────────────────────────────────────────────────────────────
 
 set -euo pipefail
-mkdir -p logs
 
-REPO_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+REPO_DIR="/l/users/mashrafi.monon/MICCAI2026-3DMedVLMS/CT-SpatialVQA"
 TEST_JSONL="${REPO_DIR}/finetuning/splits/test.jsonl"
+
+cd "${REPO_DIR}"
+mkdir -p logs
 ADAPTER_PATH="${REPO_DIR}/finetuning/checkpoints/lingshu-lora/final"
 OUTPUT="${REPO_DIR}/finetuning/results/lingshu_lora_predictions_test.jsonl"
 

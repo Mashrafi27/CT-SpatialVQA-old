@@ -4,7 +4,7 @@
 #SBATCH --gres=gpu:1
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=64G
-#SBATCH --time=24:00:00
+#SBATCH --time=08:00:00
 #SBATCH --output=logs/train_%j.out
 #SBATCH --error=logs/train_%j.err
 
@@ -14,11 +14,13 @@ NPZ_ROOT="/l/users/mashrafi.monon/MICCAI2026-3DMedVLMS/3D_VLM_Spatial/preprocess
 # ────────────────────────────────────────────────────────────────────
 
 set -euo pipefail
-mkdir -p logs
 
-REPO_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+REPO_DIR="/l/users/mashrafi.monon/MICCAI2026-3DMedVLMS/CT-SpatialVQA"
 TRAIN_JSONL="${REPO_DIR}/finetuning/splits/train.jsonl"
 OUTPUT_DIR="${REPO_DIR}/finetuning/checkpoints/lingshu-lora"
+
+cd "${REPO_DIR}"
+mkdir -p logs
 
 source activate medevalkit 2>/dev/null || conda activate medevalkit
 

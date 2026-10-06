@@ -294,61 +294,46 @@ class CTSpatialVQADataset(Dataset):
 # ── Collator ────────────────────────────────────────────────────────
 
 class VLCollator:
-    """Pads variable-length inputs for the VL model."""
+    """Pads variable-length inputs for Qwen2.5-VL."""
 
     def __init__(self, pad_token_id: int):
         self.pad_token_id = pad_token_id
 
     def __call__(self, batch: list[dict]) -> dict:
-        # Separate tensor fields from list fields
-        tensor_keys = set()
-        list_keys = set()
-        for sample in batch:
-            for k, v in sample.items():
-                if isinstance(v, torch.Tensor):
-                    tensor_keys.add(k)
-                else:
-                    list_keys.add(k)
-
         result = {}
+        keys = batch[0].keys()
 
-        # Pad tensor fields
-        for key in tensor_keys:
-            tensors = [s[key] for s in batch]
-            if key == "labels":
+        for key in keys:
+            vals = [s[key] for s in batch]
+
+            if not isinstance(vals[0], torch.Tensor):
+                # List fields: concatenate lists or collect
+                if isinstance(vals[0], list):
+                    result[key] = sum(vals, [])
+                else:
+                    result[key] = vals
+                continue
+
+            if key == "input_ids":
                 result[key] = torch.nn.utils.rnn.pad_sequence(
-                    tensors, batch_first=True, padding_value=-100
+                    vals, batch_first=True, padding_value=self.pad_token_id
                 )
             elif key == "attention_mask":
                 result[key] = torch.nn.utils.rnn.pad_sequence(
-                    tensors, batch_first=True, padding_value=0
+                    vals, batch_first=True, padding_value=0
                 )
-            elif key == "input_ids":
+            elif key == "labels":
                 result[key] = torch.nn.utils.rnn.pad_sequence(
-                    tensors, batch_first=True, padding_value=self.pad_token_id
+                    vals, batch_first=True, padding_value=-100
                 )
-            elif key == "pixel_values":
-                # Pixel values: concatenate along batch dim
-                result[key] = torch.cat(tensors, dim=0)
+            elif key in ("pixel_values", "image_grid_thw", "video_grid_thw"):
+                # These are (num_images, ...) per sample — concatenate along dim 0
+                result[key] = torch.cat(vals, dim=0)
             else:
-                # Try padding, fall back to cat/stack
                 try:
-                    result[key] = torch.nn.utils.rnn.pad_sequence(
-                        tensors, batch_first=True, padding_value=0
-                    )
+                    result[key] = torch.cat(vals, dim=0)
                 except Exception:
-                    try:
-                        result[key] = torch.cat(tensors, dim=0)
-                    except Exception:
-                        result[key] = tensors
-
-        # List fields: concatenate
-        for key in list_keys:
-            vals = [s[key] for s in batch]
-            if isinstance(vals[0], list):
-                result[key] = sum(vals, [])
-            else:
-                result[key] = vals
+                    result[key] = vals
 
         return result
 

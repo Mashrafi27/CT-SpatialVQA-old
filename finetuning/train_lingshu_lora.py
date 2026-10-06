@@ -372,7 +372,6 @@ def main():
     model = Qwen2_5_VLForConditionalGeneration.from_pretrained(
         args.model_id,
         quantization_config=bnb_config,
-        torch_dtype=dtype,
         device_map="auto",
         attn_implementation="sdpa",
     )

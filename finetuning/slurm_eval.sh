@@ -10,7 +10,7 @@
 
 # ── Paths (update these) ───────────────────────────────────────────
 NIFTI_ROOT=""          # e.g. /path/to/valid_fixed
-NPZ_ROOT=""            # e.g. /path/to/medevalkit_npz (if preprocessed)
+NPZ_ROOT="/l/users/mashrafi.monon/MICCAI2026-3DMedVLMS/3D_VLM_Spatial/preprocess/medevalkit_npz"
 # ────────────────────────────────────────────────────────────────────
 
 set -euo pipefail

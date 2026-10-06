@@ -68,7 +68,7 @@ def parse_args() -> argparse.Namespace:
                     help="Root of raw NIfTI volumes (fallback if no npz).")
     p.add_argument("--npz-root", type=Path, default=None,
                     help="Root of preprocessed .npz slice packs.")
-    p.add_argument("--num-slices", type=int, default=8,
+    p.add_argument("--num-slices", type=int, default=4,
                     help="Number of slices per volume (fewer than inference to save VRAM).")
 
     # Model

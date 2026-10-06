@@ -43,7 +43,7 @@ python "${REPO_DIR}/finetuning/train_lingshu_lora.py" \
     --train-jsonl "${TRAIN_JSONL}" \
     ${VOL_ARGS} \
     --output-dir "${OUTPUT_DIR}" \
-    --num-slices 8 \
+    --num-slices 4 \
     --epochs 3 \
     --batch-size 1 \
     --gradient-accumulation-steps 8 \

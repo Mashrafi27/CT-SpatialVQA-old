@@ -21,13 +21,14 @@ from tqdm import tqdm
 
 from transformers import (
     AutoProcessor,
+    BitsAndBytesConfig,
     Qwen2_5_VLForConditionalGeneration,
     Trainer,
     TrainingArguments,
 )
 
 try:
-    from peft import LoraConfig, get_peft_model, TaskType
+    from peft import LoraConfig, get_peft_model, prepare_model_for_kbit_training, TaskType
 except ImportError:
     raise SystemExit("Missing peft. Install with: pip install peft")
 
@@ -359,28 +360,31 @@ def main():
 
     logger.info(f"Loading model: {args.model_id}")
     dtype = torch.float16 if args.dtype == "float16" else torch.bfloat16
-    # Try flash_attention_2 if available, fall back to sdpa
-    try:
-        model = Qwen2_5_VLForConditionalGeneration.from_pretrained(
-            args.model_id,
-            torch_dtype=dtype,
-            device_map="auto",
-            attn_implementation="flash_attention_2",
-        )
-        logger.info("Using flash_attention_2")
-    except (ImportError, ValueError):
-        model = Qwen2_5_VLForConditionalGeneration.from_pretrained(
-            args.model_id,
-            torch_dtype=dtype,
-            device_map="auto",
-            attn_implementation="sdpa",
-        )
-        logger.info("flash_attention_2 not available, using sdpa")
+
+    # 4-bit quantization (QLoRA) to fit 7B model + training on 32GB GPU
+    bnb_config = BitsAndBytesConfig(
+        load_in_4bit=True,
+        bnb_4bit_quant_type="nf4",
+        bnb_4bit_compute_dtype=dtype,
+        bnb_4bit_use_double_quant=True,
+    )
+
+    model = Qwen2_5_VLForConditionalGeneration.from_pretrained(
+        args.model_id,
+        quantization_config=bnb_config,
+        device_map="auto",
+        attn_implementation="sdpa",
+    )
+    logger.info("Loaded model with 4-bit quantization (QLoRA)")
+
     processor = AutoProcessor.from_pretrained(args.model_id, use_fast=True)
 
     # Ensure pad token
     if processor.tokenizer.pad_token_id is None:
         processor.tokenizer.pad_token = processor.tokenizer.eos_token
+
+    # Prepare for k-bit training
+    model = prepare_model_for_kbit_training(model)
 
     # Apply LoRA
     logger.info(f"Applying LoRA (r={args.lora_r}, alpha={args.lora_alpha})")
@@ -394,10 +398,6 @@ def main():
     )
     model = get_peft_model(model, lora_config)
     model.print_trainable_parameters()
-
-    # Enable gradient checkpointing
-    model.enable_input_require_grads()
-    model.gradient_checkpointing_enable()
 
     # Dataset
     logger.info("Loading dataset...")
@@ -425,7 +425,7 @@ def main():
         save_steps=args.save_steps,
         save_total_limit=args.save_total_limit,
         seed=args.seed,
-        dataloader_num_workers=2,
+        dataloader_num_workers=0,
         remove_unused_columns=False,
         gradient_checkpointing=True,
         report_to="wandb",

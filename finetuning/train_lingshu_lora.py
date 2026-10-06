@@ -369,14 +369,13 @@ def main():
         bnb_4bit_use_double_quant=True,
     )
 
-    # Load with device_map="auto" — bitsandbytes handles quantization during load
     model = Qwen2_5_VLForConditionalGeneration.from_pretrained(
         args.model_id,
         quantization_config=bnb_config,
         torch_dtype=dtype,
         device_map="auto",
+        max_memory={0: "28GiB", "cpu": "48GiB"},
         attn_implementation="sdpa",
-        low_cpu_mem_usage=True,
     )
     logger.info("Loaded model with 4-bit quantization (QLoRA)")
 

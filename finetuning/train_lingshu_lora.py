@@ -361,22 +361,14 @@ def main():
     logger.info(f"Loading model: {args.model_id}")
     dtype = torch.float16 if args.dtype == "float16" else torch.bfloat16
 
-    # 4-bit quantization (QLoRA) to fit 7B model + training on 32GB GPU
-    bnb_config = BitsAndBytesConfig(
-        load_in_4bit=True,
-        bnb_4bit_quant_type="nf4",
-        bnb_4bit_compute_dtype=dtype,
-        bnb_4bit_use_double_quant=True,
-    )
-
     model = Qwen2_5_VLForConditionalGeneration.from_pretrained(
         args.model_id,
-        quantization_config=bnb_config,
         torch_dtype=dtype,
-        device_map={"": 0},
+        device_map="auto",
         attn_implementation="sdpa",
+        low_cpu_mem_usage=True,
     )
-    logger.info("Loaded model with 4-bit quantization (QLoRA)")
+    logger.info("Loaded model in bf16 with device_map=auto")
 
     processor = AutoProcessor.from_pretrained(args.model_id, use_fast=True)
 
@@ -384,8 +376,8 @@ def main():
     if processor.tokenizer.pad_token_id is None:
         processor.tokenizer.pad_token = processor.tokenizer.eos_token
 
-    # Prepare for k-bit training
-    model = prepare_model_for_kbit_training(model)
+    # Enable input grads for gradient checkpointing with LoRA
+    model.enable_input_require_grads()
 
     # Apply LoRA
     logger.info(f"Applying LoRA (r={args.lora_r}, alpha={args.lora_alpha})")

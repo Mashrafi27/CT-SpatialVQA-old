@@ -374,7 +374,6 @@ def main():
         quantization_config=bnb_config,
         torch_dtype=dtype,
         device_map="auto",
-        max_memory={0: "28GiB", "cpu": "48GiB"},
         attn_implementation="sdpa",
     )
     logger.info("Loaded model with 4-bit quantization (QLoRA)")
@@ -398,11 +397,16 @@ def main():
         target_modules=args.lora_target_modules,
         bias="none",
     )
+    # Save device map before PEFT wrapping
+    base_device_map = getattr(model, "hf_device_map", None)
+
     model = get_peft_model(model, lora_config)
     model.print_trainable_parameters()
 
-    # Ensure Trainer/accelerate doesn't try to move the quantized model
+    # Propagate quantization flags to PeftModel so accelerate skips .to(device)
     model.is_loaded_in_4bit = True
+    if base_device_map is not None:
+        model.hf_device_map = base_device_map
 
     # Dataset
     logger.info("Loading dataset...")

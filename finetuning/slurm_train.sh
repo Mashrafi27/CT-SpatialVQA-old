@@ -13,6 +13,7 @@ NIFTI_ROOT=""          # e.g. /path/to/valid_fixed
 NPZ_ROOT="/l/users/mashrafi.monon/MICCAI2026-3DMedVLMS/3D_VLM_Spatial/preprocess/medevalkit_npz"
 # ────────────────────────────────────────────────────────────────────
 
+export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
 set -euo pipefail
 
 REPO_DIR="/l/users/mashrafi.monon/MICCAI2026-3DMedVLMS/CT-SpatialVQA"

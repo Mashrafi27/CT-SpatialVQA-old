@@ -372,7 +372,8 @@ def main():
     model = Qwen2_5_VLForConditionalGeneration.from_pretrained(
         args.model_id,
         quantization_config=bnb_config,
-        device_map="auto",
+        torch_dtype=dtype,
+        device_map={"": 0},
         attn_implementation="sdpa",
     )
     logger.info("Loaded model with 4-bit quantization (QLoRA)")

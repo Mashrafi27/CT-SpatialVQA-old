@@ -7,6 +7,7 @@
 #SBATCH --time=08:00:00
 #SBATCH --output=logs/train_%j.out
 #SBATCH --error=logs/train_%j.err
+#SBATCH --exclude=gpu-02
 
 # ── Paths (update these) ───────────────────────────────────────────
 NIFTI_ROOT=""          # e.g. /path/to/valid_fixed

@@ -67,7 +67,7 @@ def parse_args() -> argparse.Namespace:
                     help="Root of raw NIfTI volumes (fallback if no npz).")
     p.add_argument("--npz-root", type=Path, default=None,
                     help="Root of preprocessed .npz slice packs.")
-    p.add_argument("--num-slices", type=int, default=16,
+    p.add_argument("--num-slices", type=int, default=8,
                     help="Number of slices per volume (fewer than inference to save VRAM).")
 
     # Model
@@ -246,25 +246,22 @@ class CTSpatialVQADataset(Dataset):
             prompt_messages, tokenize=False, add_generation_prompt=True,
         )
 
-        # Process with vision
+        # Process with vision (no truncation — image tokens can't be split)
         image_inputs, video_inputs = process_vision_info(messages)
         full_inputs = self.processor(
             text=[full_text],
             images=image_inputs,
             videos=video_inputs,
             padding=False,
-            truncation=True,
-            max_length=self.max_seq_length,
             return_tensors="pt",
         )
 
+        prompt_image_inputs, prompt_video_inputs = process_vision_info(prompt_messages)
         prompt_inputs = self.processor(
             text=[prompt_text],
-            images=image_inputs,
-            videos=video_inputs,
+            images=prompt_image_inputs,
+            videos=prompt_video_inputs,
             padding=False,
-            truncation=True,
-            max_length=self.max_seq_length,
             return_tensors="pt",
         )
 

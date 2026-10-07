@@ -134,11 +134,14 @@ def main():
 
     print(f"Loading base model: {args.base_model_id}")
     model = Qwen2_5_VLForConditionalGeneration.from_pretrained(
-        args.base_model_id, torch_dtype=dtype, device_map="auto",
+        args.base_model_id, torch_dtype=dtype, device_map={"": args.device},
     )
 
     print(f"Loading LoRA adapter: {args.adapter_path}")
     model = PeftModel.from_pretrained(model, str(args.adapter_path))
+    # Fold LoRA into the base weights: same outputs, but no extra LoRA activations
+    # (32-slice prefill OOMs on a 32GB GPU otherwise)
+    model = model.merge_and_unload()
     model.eval()
 
     processor = AutoProcessor.from_pretrained(args.base_model_id, use_fast=True)

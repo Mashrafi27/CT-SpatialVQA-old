@@ -1,9 +1,9 @@
 #!/bin/bash
 #SBATCH --job-name=lingshu-eval
-#SBATCH --partition=gpu
+#SBATCH --partition=ws-ia
 #SBATCH --gres=gpu:1
 #SBATCH --cpus-per-task=8
-#SBATCH --mem=64G
+#SBATCH --mem=32G
 #SBATCH --time=08:00:00
 #SBATCH --output=logs/eval_%j.out
 #SBATCH --error=logs/eval_%j.err
@@ -13,6 +13,7 @@ NIFTI_ROOT=""          # e.g. /path/to/valid_fixed
 NPZ_ROOT="/l/users/mashrafi.monon/MICCAI2026-3DMedVLMS/3D_VLM_Spatial/preprocess/medevalkit_npz"
 # ────────────────────────────────────────────────────────────────────
 
+export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
 set -euo pipefail
 
 REPO_DIR="/l/users/mashrafi.monon/MICCAI2026-3DMedVLMS/CT-SpatialVQA"
@@ -20,10 +21,13 @@ TEST_JSONL="${REPO_DIR}/finetuning/splits/test.jsonl"
 
 cd "${REPO_DIR}"
 mkdir -p logs
-ADAPTER_PATH="${REPO_DIR}/finetuning/checkpoints/lingshu-lora/final"
-OUTPUT="${REPO_DIR}/finetuning/results/lingshu_lora_predictions_test.jsonl"
+ADAPTER_PATH="${ADAPTER_PATH:-${REPO_DIR}/finetuning/checkpoints/lingshu-lora/final}"
+OUTPUT="${OUTPUT:-${REPO_DIR}/finetuning/results/lingshu_lora_predictions_test.jsonl}"
 
-source activate medevalkit 2>/dev/null || conda activate medevalkit
+set +u  # conda activate scripts reference unset vars
+source /apps/local/anaconda3/etc/profile.d/conda.sh
+conda activate medevalkit
+set -u
 
 pip install peft --quiet 2>/dev/null
 

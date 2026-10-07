@@ -4,7 +4,7 @@
 #SBATCH --gres=gpu:1
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=32G
-#SBATCH --time=08:00:00
+#SBATCH --time=24:00:00
 #SBATCH --output=logs/train_%j.out
 #SBATCH --error=logs/train_%j.err
 
@@ -23,10 +23,11 @@ OUTPUT_DIR="${REPO_DIR}/finetuning/checkpoints/lingshu-lora"
 cd "${REPO_DIR}"
 mkdir -p logs
 
-source activate medevalkit 2>/dev/null || conda activate medevalkit
+set +u  # conda activate scripts reference unset vars
+source /apps/local/anaconda3/etc/profile.d/conda.sh
+conda activate lingshu-train  # medevalkit clone with torch 2.6 (needed to resume checkpoints)
+set -u
 
-# Install fine-tuning deps if missing
-pip install peft bitsandbytes --quiet 2>/dev/null
 
 # Build volume args
 VOL_ARGS=""
@@ -50,7 +51,8 @@ python "${REPO_DIR}/finetuning/train_lingshu_lora.py" \
     --lr 2e-4 \
     --lora-r 16 \
     --lora-alpha 32 \
-    --save-steps 200 \
-    --logging-steps 10
+    --save-steps 100 \
+    --logging-steps 10 \
+    --resume-from-checkpoint latest
 
 echo "Training complete. Adapter saved to ${OUTPUT_DIR}/final"

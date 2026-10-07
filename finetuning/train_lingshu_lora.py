@@ -26,6 +26,7 @@ from transformers import (
     Trainer,
     TrainingArguments,
 )
+from transformers.trainer_utils import get_last_checkpoint
 
 try:
     from peft import LoraConfig, get_peft_model, prepare_model_for_kbit_training, TaskType
@@ -95,6 +96,8 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--save-steps", type=int, default=200)
     p.add_argument("--save-total-limit", type=int, default=3)
     p.add_argument("--seed", type=int, default=42)
+    p.add_argument("--resume-from-checkpoint", type=str, default=None,
+                    help="Checkpoint dir to resume from, or 'latest' for the newest in --output-dir.")
 
     return p.parse_args()
 
@@ -434,8 +437,14 @@ def main():
         data_collator=collator,
     )
 
+    resume = args.resume_from_checkpoint
+    if resume == "latest":
+        resume = get_last_checkpoint(str(args.output_dir)) if args.output_dir.is_dir() else None
+    if resume:
+        logger.info(f"Resuming from checkpoint: {resume}")
+
     logger.info("Starting training...")
-    trainer.train()
+    trainer.train(resume_from_checkpoint=resume)
 
     # Save final adapter
     final_dir = args.output_dir / "final"

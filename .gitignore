@@ -42,3 +42,9 @@ benchmarking/preprocess/vila_m3_npy/
 benchmarking/preprocess/ctchat_basic_npy/
 benchmarking/inference/reg2rg/
 archive/
+
+# Fine-tuning run outputs
+__pycache__/
+logs/
+wandb/
+finetuning/results/

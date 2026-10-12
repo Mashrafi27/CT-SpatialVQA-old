@@ -46,7 +46,7 @@ python "${REPO_DIR}/finetuning/eval_lingshu_lora.py" \
     ${VOL_ARGS} \
     --adapter-path "${ADAPTER_PATH}" \
     --output "${OUTPUT}" \
-    --num-slices 32 \
+    --num-slices "${NUM_SLICES:-4}" \
     --resume
 
 echo "Evaluation complete. Predictions at ${OUTPUT}"

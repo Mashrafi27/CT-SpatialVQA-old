@@ -14,6 +14,11 @@
 # --resume is always on, so resubmitting continues where a timed-out job stopped.
 
 export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
+# Compute nodes cannot reach the HF Hub; the model is cached, so stay offline
+# (otherwise from_pretrained hangs on a CDN request before loading weights).
+export HF_HUB_OFFLINE=1
+export TRANSFORMERS_OFFLINE=1
+export HF_HUB_DISABLE_TELEMETRY=1
 set -euo pipefail
 
 REPO_DIR="/l/users/mashrafi.monon/MICCAI2026-3DMedVLMS/CT-SpatialVQA"

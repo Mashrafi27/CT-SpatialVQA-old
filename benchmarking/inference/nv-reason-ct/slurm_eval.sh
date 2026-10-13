@@ -3,14 +3,18 @@
 #SBATCH --partition=ws-ia
 #SBATCH --gres=gpu:1
 #SBATCH --cpus-per-task=8
-#SBATCH --mem=48G
+#SBATCH --mem=24G
 #SBATCH --time=24:00:00
-#SBATCH --output=logs/nvreason_%j.out
-#SBATCH --error=logs/nvreason_%j.err
+#SBATCH --output=logs/nvreason_%A_%a.out
+#SBATCH --error=logs/nvreason_%A_%a.err
 
 # Usage (from CT-SpatialVQA/):
-#   sbatch benchmarking/inference/nv-reason-ct/slurm_eval.sh
+#   sbatch benchmarking/inference/nv-reason-ct/slurm_eval.sh                      # single job
+#   sbatch --array=0-5 benchmarking/inference/nv-reason-ct/slurm_eval.sh          # 6 parallel shards
 # Env overrides: LIMIT (0 = all), ENABLE_THINKING (0/1), MAX_NEW_TOKENS, OUTPUT.
+# As an array job each task handles one contiguous shard and writes OUTPUT with a
+# ".shard<i>of<n>" suffix; merge afterwards with:
+#   cat <OUTPUT>.shard*of<n> > <OUTPUT>
 # --resume is always on, so resubmitting continues where a timed-out job stopped.
 
 export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
@@ -37,6 +41,12 @@ if [ "${ENABLE_THINKING:-0}" = "1" ]; then
     THINK_ARGS="--enable-thinking"
 fi
 
+SHARD_ARGS=""
+if [ -n "${SLURM_ARRAY_TASK_COUNT:-}" ] && [ "${SLURM_ARRAY_TASK_COUNT}" -gt 1 ]; then
+    SHARD_ARGS="--num-shards ${SLURM_ARRAY_TASK_COUNT} --shard-index ${SLURM_ARRAY_TASK_ID}"
+    OUTPUT="${OUTPUT}.shard${SLURM_ARRAY_TASK_ID}of${SLURM_ARRAY_TASK_COUNT}"
+fi
+
 "${PYTHON}" "${REPO_DIR}/benchmarking/inference/nv-reason-ct/run_custom_eval.py" \
     --dataset "${DATASET}" \
     --nifti-root "${NIFTI_ROOT}" \
@@ -45,6 +55,7 @@ fi
     --max-new-tokens "${MAX_NEW_TOKENS:-256}" \
     --limit "${LIMIT:-0}" \
     ${THINK_ARGS} \
+    ${SHARD_ARGS} \
     --resume
 
 echo "Evaluation complete. Predictions at ${OUTPUT}"

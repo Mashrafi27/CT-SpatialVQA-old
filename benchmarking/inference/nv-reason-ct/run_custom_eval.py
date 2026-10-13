@@ -39,7 +39,13 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--dtype", default="bfloat16", choices=["float16", "bfloat16"])
     parser.add_argument("--resume", action="store_true")
     parser.add_argument("--limit", type=int, default=0, help="Only process first N records (0 = all).")
-    return parser.parse_args()
+    parser.add_argument("--num-shards", type=int, default=1,
+                        help="Split the dataset into this many contiguous shards (for parallel SLURM jobs).")
+    parser.add_argument("--shard-index", type=int, default=0, help="Which shard this process handles (0-based).")
+    args = parser.parse_args()
+    if not 0 <= args.shard_index < args.num_shards:
+        parser.error(f"--shard-index must be in [0, {args.num_shards})")
+    return args
 
 
 def derive_nifti_path(nifti_root: Path, case_id: str) -> Path:
@@ -109,10 +115,19 @@ def main() -> None:
     total = sum(1 for _ in iter_jsonl(Path(args.dataset)))
     if args.limit and args.limit > 0:
         total = min(total, args.limit)
+    # Contiguous shards: questions on the same case are consecutive in the dataset, so each
+    # shard keeps the per-volume cache effective (round-robin would reload volumes constantly).
+    shard_lo = total * args.shard_index // args.num_shards
+    shard_hi = total * (args.shard_index + 1) // args.num_shards
+    total = shard_hi - shard_lo
 
     with output_path.open("a") as f_out:
         for idx, ex in enumerate(tqdm(iter_jsonl(Path(args.dataset)), total=total, desc="Running NV-Reason-CT")):
             if args.limit and args.limit > 0 and idx >= args.limit:
+                break
+            if idx < shard_lo:
+                continue
+            if idx >= shard_hi:
                 break
             case_id = ex.get("case_id")
             question = ex.get("question")

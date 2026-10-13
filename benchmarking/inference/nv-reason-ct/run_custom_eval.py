@@ -8,6 +8,7 @@ an anatomy-aware 192^3 crop (24x24x24 = 13,824 visual tokens).
 from __future__ import annotations
 
 import argparse
+import itertools
 import json
 import time
 from pathlib import Path
@@ -122,12 +123,10 @@ def main() -> None:
     total = shard_hi - shard_lo
 
     with output_path.open("a") as f_out:
-        for idx, ex in enumerate(tqdm(iter_jsonl(Path(args.dataset)), total=total, desc="Running NV-Reason-CT")):
+        # Slice to this shard before wrapping in tqdm so skipped rows do not inflate the bar.
+        shard_iter = itertools.islice(enumerate(iter_jsonl(Path(args.dataset))), shard_lo, shard_hi)
+        for idx, ex in tqdm(shard_iter, total=total, desc="Running NV-Reason-CT"):
             if args.limit and args.limit > 0 and idx >= args.limit:
-                break
-            if idx < shard_lo:
-                continue
-            if idx >= shard_hi:
                 break
             case_id = ex.get("case_id")
             question = ex.get("question")

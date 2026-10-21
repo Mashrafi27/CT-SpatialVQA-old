@@ -28,11 +28,16 @@ THINK_END = "</think>"
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Run NV-Reason-CT on CT volumes.")
     parser.add_argument("--dataset", required=True, help="Input JSONL with case_id/question/answer.")
-    parser.add_argument("--nifti-root", required=True, help="Root of raw NIfTI volumes (valid_fixed).")
+    parser.add_argument("--nifti-root", default=None, help="Root of raw NIfTI volumes (valid_fixed).")
     parser.add_argument("--output", required=True, help="Output JSONL for predictions.")
     parser.add_argument("--model-id", default="nvidia/NV-Reason-CT", help="HF model id.")
     parser.add_argument("--anatomy-region", default="chest", choices=["chest", "abdomen", "none"],
                         help="Anatomy-aware crop passed to the processor ('none' = centered crop).")
+    parser.add_argument("--input-mode", default="image", choices=["image", "blind", "report", "image_report"],
+                        help="What the model sees: the CT volume (default), the question only (blind), "
+                             "the radiology report instead of the volume, or both volume and report.")
+    parser.add_argument("--reports-json", default=None,
+                        help="JSON mapping case_id -> {Findings_EN, Impressions_EN}; required for report modes.")
     parser.add_argument("--enable-thinking", action="store_true",
                         help="Let the model emit <think> reasoning before the answer.")
     parser.add_argument("--max-new-tokens", type=int, default=256)
@@ -46,7 +51,40 @@ def parse_args() -> argparse.Namespace:
     args = parser.parse_args()
     if not 0 <= args.shard_index < args.num_shards:
         parser.error(f"--shard-index must be in [0, {args.num_shards})")
+    if uses_image(args.input_mode) and not args.nifti_root:
+        parser.error("--nifti-root is required unless --input-mode is blind or report")
+    if uses_report(args.input_mode) and not args.reports_json:
+        parser.error("--reports-json is required for --input-mode report / image_report")
     return args
+
+
+def uses_image(mode: str) -> bool:
+    return mode in ("image", "image_report")
+
+
+def uses_report(mode: str) -> bool:
+    return mode in ("report", "image_report")
+
+
+def load_reports(path: Path) -> dict[str, str]:
+    """Return case_id -> formatted report text (Findings + Impressions)."""
+    raw = json.load(open(path))
+    reports = {}
+    for case_id, rec in raw.items():
+        findings = (rec.get("Findings_EN") or "").strip()
+        impressions = (rec.get("Impressions_EN") or "").strip()
+        reports[case_id] = f"Findings: {findings}\nImpressions: {impressions}"
+    return reports
+
+
+def build_text(mode: str, question: str, report: str | None) -> str:
+    if not uses_report(mode):
+        return question
+    return (
+        "Here is the radiology report for this CT scan.\n"
+        f"{report}\n\n"
+        f"Question: {question}"
+    )
 
 
 def derive_nifti_path(nifti_root: Path, case_id: str) -> Path:
@@ -93,7 +131,8 @@ def split_reasoning(text: str) -> tuple[str, str, bool]:
 
 def main() -> None:
     args = parse_args()
-    nifti_root = Path(args.nifti_root)
+    nifti_root = Path(args.nifti_root) if args.nifti_root else None
+    reports = load_reports(Path(args.reports_json)) if uses_report(args.input_mode) else {}
     output_path = Path(args.output)
     output_path.parent.mkdir(parents=True, exist_ok=True)
     anatomy_region = None if args.anatomy_region == "none" else args.anatomy_region
@@ -111,7 +150,8 @@ def main() -> None:
         attn_implementation="sdpa",
     ).eval().to(args.device)
     processor = AutoProcessor.from_pretrained(args.model_id, trust_remote_code=True)
-    cache_last_volume(processor.image_processor_3d)
+    if uses_image(args.input_mode):
+        cache_last_volume(processor.image_processor_3d)
 
     total = sum(1 for _ in iter_jsonl(Path(args.dataset)))
     if args.limit and args.limit > 0:
@@ -134,23 +174,37 @@ def main() -> None:
             if (case_id, question) in processed:
                 continue
 
-            nifti_path = derive_nifti_path(nifti_root, case_id)
-            if not nifti_path.exists():
-                raise FileNotFoundError(f"Missing NIfTI: {nifti_path}")
+            report = None
+            if uses_report(args.input_mode):
+                report = reports.get(case_id)
+                if report is None:
+                    raise KeyError(f"No report for case {case_id} in {args.reports_json}")
+            text = build_text(args.input_mode, question, report)
 
-            messages = [{"role": "user", "content": [{"type": "image"}, {"type": "text", "text": question}]}]
+            content = [{"type": "text", "text": text}]
+            if uses_image(args.input_mode):
+                nifti_path = derive_nifti_path(nifti_root, case_id)
+                if not nifti_path.exists():
+                    raise FileNotFoundError(f"Missing NIfTI: {nifti_path}")
+                content.insert(0, {"type": "image"})
+
+            messages = [{"role": "user", "content": content}]
             prompt = processor.apply_chat_template(
                 messages,
                 tokenize=False,
                 add_generation_prompt=True,
                 enable_thinking=args.enable_thinking,
             )
-            inputs = processor(
-                text=prompt,
-                images3d=[str(nifti_path)],
-                anatomy_region=anatomy_region,
-                return_tensors="pt",
-            ).to(model.device)
+            if uses_image(args.input_mode):
+                inputs = processor(
+                    text=prompt,
+                    images3d=[str(nifti_path)],
+                    anatomy_region=anatomy_region,
+                    return_tensors="pt",
+                ).to(model.device)
+            else:
+                # Text-only: bypass the 3D image processor entirely.
+                inputs = processor.tokenizer(prompt, return_tensors="pt").to(model.device)
 
             t0 = time.time()
             with torch.inference_mode():
@@ -176,7 +230,8 @@ def main() -> None:
                 answer=answer,
                 prediction=prediction,
                 model_id=args.model_id,
-                anatomy_region=args.anatomy_region,
+                anatomy_region=args.anatomy_region if uses_image(args.input_mode) else None,
+                input_mode=args.input_mode,
                 enable_thinking=args.enable_thinking,
                 reasoning=reasoning,
                 thinking_finished=finished,

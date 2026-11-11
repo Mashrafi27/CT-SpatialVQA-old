@@ -1,0 +1,89 @@
+Wed Nov 11 15:50:53 +04 2026  host ws-l4-021
+Disk quotas for usr mashrafi.monon (uid 3152):
+     Filesystem    used  bquota  blimit  bgrace   files  iquota  ilimit  igrace 
+             /l  2.099T      3T   3.15T       -  325133 50000000 52500000       - 
+
+== biggest folders (2 levels down, >= 10 GB)
+2.1T	/l/users/mashrafi.monon
+1.9T	/l/users/mashrafi.monon/MICCAI2026-3DMedVLMS
+1.5T	/l/users/mashrafi.monon/MICCAI2026-3DMedVLMS/3D_VLM_Spatial
+244G	/l/users/mashrafi.monon/MICCAI2026-3DMedVLMS/benchmarking
+124G	/l/users/mashrafi.monon/CV8502_A1/data
+124G	/l/users/mashrafi.monon/CV8502_A1
+41G	/l/users/mashrafi.monon/vlm_jailbreak_attack_defense
+18G	/l/users/mashrafi.monon/models/Qwen3.8-27B-INT4
+18G	/l/users/mashrafi.monon/models
+17G	/l/users/mashrafi.monon/MICCAI2026-3DMedVLMS/checkpoints
+16G	/l/users/mashrafi.monon/vlm_jailbreak_attack_defense/models
+16G	/l/users/mashrafi.monon/vlm_jailbreak_attack_defense/.git
+16G	/l/users/mashrafi.monon/MMContraFuse
+16G	/l/users/mashrafi.monon/LLaVA-Med
+16G	/l/users/mashrafi.monon/LLaVA
+15G	/l/users/mashrafi.monon/LLaVA/checkpoints
+15G	/l/users/mashrafi.monon/LLaVA-Med/checkpoints
+14G	/l/users/mashrafi.monon/HC701
+13G	/l/users/mashrafi.monon/MICCAI2026-3DMedVLMS/.git
+
+== CT-RATE scans anywhere (train_*/valid_* .nii.gz), grouped by folder 3 levels up
+3039 /l/users/mashrafi.monon/MICCAI2026-3DMedVLMS/3D_VLM_Spatial/dataset/data_volumes/dataset/valid_fixed/
+367 /l/users/mashrafi.monon/MICCAI2026-3DMedVLMS/3D_VLM_Spatial/dataset/resampled_vista3d_fixed/
+367 /l/users/mashrafi.monon/MICCAI2026-3DMedVLMS/3D_VLM_Spatial/dataset/resampled_merlin/
+100 /l/users/mashrafi.monon/MICCAI2026-3DMedVLMS/3D_VLM_Spatial/dataset/data_volumes/dataset/train_fixed/
+
+== archives >= 1 GB (tar / zip / npz / pt)
+  102.9 GB  /l/users/mashrafi.monon/MICCAI2026-3DMedVLMS/medevalkit_npz.tar
+   51.4 GB  /l/users/mashrafi.monon/MICCAI2026-3DMedVLMS/merlin_npy.tar
+   49.9 GB  /l/users/mashrafi.monon/MICCAI2026-3DMedVLMS/benchmarking/inference/radfm/repo/Quick_demo/pytorch_model.zip
+   21.5 GB  /l/users/mashrafi.monon/MICCAI2026-3DMedVLMS/benchmarking/inference/radfm/repo/Quick_demo/RadFM_full.zip
+   18.6 GB  /l/users/mashrafi.monon/models/Qwen3.8-27B-INT4/model.safetensors
+   10.0 GB  /l/users/mashrafi.monon/MICCAI2026-3DMedVLMS/benchmarking/inference/radfm/repo/Quick_demo/Language_files_7b/model-00001-of-00002.safetensors
+    9.9 GB  /l/users/mashrafi.monon/MICCAI2026-3DMedVLMS/benchmarking/inference/radfm/repo/Quick_demo/Language_files/model-00001-of-00003.safetensors
+    9.9 GB  /l/users/mashrafi.monon/MICCAI2026-3DMedVLMS/benchmarking/inference/radfm/repo/Quick_demo/Language_files/model-00002-of-00003.safetensors
+    8.5 GB  /l/users/mashrafi.monon/work_adni_interim.zip
+    7.3 GB  /l/users/mashrafi.monon/shard-000004.tar
+    6.9 GB  /l/users/mashrafi.monon/shard-000001.tar
+    6.9 GB  /l/users/mashrafi.monon/MICCAI2026-3DMedVLMS/benchmarking/inference/radfm/repo/Quick_demo/RadFM.zip
+    6.5 GB  /l/users/mashrafi.monon/shard-000005.tar
+    6.3 GB  /l/users/mashrafi.monon/shard-000002.tar
+    6.2 GB  /l/users/mashrafi.monon/MICCAI2026-3DMedVLMS/benchmarking/inference/radfm/repo/Quick_demo/Language_files/model-00003-of-00003.safetensors
+    5.9 GB  /l/users/mashrafi.monon/shard-000003.tar
+    5.8 GB  /l/users/mashrafi.monon/shard-000000.tar
+    5.5 GB  /l/users/mashrafi.monon/vlm_jailbreak_attack_defense/models/OpenFlamingo-9B/checkpoint.pt
+    5.1 GB  /l/users/mashrafi.monon/latest.pt
+    5.0 GB  /l/users/mashrafi.monon/LLaVA/checkpoints/llava-med-v1.5-mistral-7b/model-00002-of-00004.safetensors
+    5.0 GB  /l/users/mashrafi.monon/LLaVA-Med/checkpoints/llava-med-v1.5-mistral-7b/model-00002-of-00004.safetensors
+    5.0 GB  /l/users/mashrafi.monon/MICCAI2026-3DMedVLMS/benchmarking/inference/ct-chat/models/llama_base_3.1_8b/model-00002-of-00004.safetensors
+    5.0 GB  /l/users/mashrafi.monon/MICCAI2026-3DMedVLMS/benchmarking/inference/ct-chat/models/llama_base_3.1_8b/model-00001-of-00004.safetensors
+    4.9 GB  /l/users/mashrafi.monon/LLaVA/checkpoints/llava-med-v1.5-mistral-7b/model-00001-of-00004.safetensors
+    4.9 GB  /l/users/mashrafi.monon/LLaVA-Med/checkpoints/llava-med-v1.5-mistral-7b/model-00001-of-00004.safetensors
+    4.9 GB  /l/users/mashrafi.monon/LLaVA/checkpoints/llava-med-v1.5-mistral-7b/model-00003-of-00004.safetensors
+    4.9 GB  /l/users/mashrafi.monon/LLaVA-Med/checkpoints/llava-med-v1.5-mistral-7b/model-00003-of-00004.safetensors
+    4.9 GB  /l/users/mashrafi.monon/MICCAI2026-3DMedVLMS/benchmarking/inference/ct-chat/models/llama_base_3.1_8b/model-00003-of-00004.safetensors
+    4.4 GB  /l/users/mashrafi.monon/vlm_jailbreak_attack_defense/models/InternVL2-2B/model.safetensors
+    4.2 GB  /l/users/mashrafi.monon/CV8502_A1/data/hf_cxr14/data/images/images_011.zip
+    4.2 GB  /l/users/mashrafi.monon/CV8502_A1/data/hf_cxr14/data/images/images_010.zip
+    4.2 GB  /l/users/mashrafi.monon/vlm_jailbreak_attack_defense/models/InternVL3-2B/model.safetensors
+    4.1 GB  /l/users/mashrafi.monon/CV8502_A1/data/hf_cxr14/data/images/images_009.zip
+    4.0 GB  /l/users/mashrafi.monon/CV8502_A1/data/hf_cxr14/data/images/images_008.zip
+    4.0 GB  /l/users/mashrafi.monon/CV8502_A1/data/hf_cxr14/data/images/images_007.zip
+    4.0 GB  /l/users/mashrafi.monon/CV8502_A1/data/hf_cxr14/data/images/images_006.zip
+    4.0 GB  /l/users/mashrafi.monon/CV8502_A1/data/hf_cxr14/data/images/images_002.zip
+    3.9 GB  /l/users/mashrafi.monon/CV8502_A1/data/hf_cxr14/data/images/images_005.zip
+    3.9 GB  /l/users/mashrafi.monon/CV8502_A1/data/hf_cxr14/data/images/images_003.zip
+    3.8 GB  /l/users/mashrafi.monon/CV8502_A1/data/hf_cxr14/data/images/images_004.zip
+    3.5 GB  /l/users/mashrafi.monon/MICCAI2026-3DMedVLMS/benchmarking/inference/radfm/repo/Quick_demo/Language_files_7b/model-00002-of-00002.safetensors
+    2.9 GB  /l/users/mashrafi.monon/CV8502_A1/data/hf_cxr14/data/images/images_012.zip
+    2.5 GB  /l/users/mashrafi.monon/HC701/HC701-Assignment2/pneumonia_data/chest-xray-pneumonia.zip
+    2.1 GB  /l/users/mashrafi.monon/CV8501_A1/data.zip
+    2.0 GB  /l/users/mashrafi.monon/CV8502_A1/data/hf_cxr14/data/images/images_001.zip
+    1.9 GB  /l/users/mashrafi.monon/vlm_jailbreak_attack_defense/models/InternVL3-1B/model.safetensors
+    1.9 GB  /l/users/mashrafi.monon/vlm_jailbreak_attack_defense/models/InternVL2-1B/model.safetensors
+    1.8 GB  /l/users/mashrafi.monon/MICCAI2026-3DMedVLMS/benchmarking/inference/ct-chat/CT_CLIP_encoder/CT-CLIP_v2.pt
+    1.2 GB  /l/users/mashrafi.monon/target_encoder_e200.pt
+    1.2 GB  /l/users/mashrafi.monon/MICCAI2026-3DMedVLMS/benchmarking/inference/ct-chat/models/llama_base_3.1_8b/model-00004-of-00004.safetensors
+
+== HF dataset cache (in /home, separate quota)
+82K	/home/mashrafi.monon/.cache/huggingface/hub/datasets--alkzar90--NIH-Chest-X-ray-dataset
+1.1M	/home/mashrafi.monon/.cache/huggingface/hub/datasets--ibrahimhamamci--CT-RATE
+
+Wed Nov 11 16:04:07 +04 2026 DONE

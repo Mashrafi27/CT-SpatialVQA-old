@@ -1,0 +1,20 @@
+{
+  "final_grid_size": [
+    24,
+    24,
+    24
+  ],
+  "image_processor_type": "ImageLoader3D",
+  "merge_size": 1,
+  "normalize_mode": "ct",
+  "pixdim": [
+    2.0,
+    2.0,
+    2.0
+  ],
+  "spatial_size": [
+    192,
+    192,
+    192
+  ]
+}

@@ -1,0 +1,69 @@
+host ws-l4-021  date Wed Nov 11 14:47:51 +04 2026  user mashrafi.monon  branch finetune fb5ee78
+
+== 1 leftover lens processes on this host
+none on ws-l4-021 (if this is not the login node, the login node was not checked)
+
+== 2 lens output
+missing; the SLURM job computes it first
+
+== 3 submit per-axis readout job
+submitted job 291491
+
+== 4 CT-RATE data for task 7
+/l/users/mashrafi.monon/CV8501_A2/data/raw/HAM10000_metadata.csv
+/l/users/mashrafi.monon/MMContraFuse/data/processed_tabular_data/all_covered_case_ids_with_metadata.csv
+-- directories named train / train_fixed / valid_fixed (with .nii.gz counts):
+/l/users/mashrafi.monon/EchoJEPAv2/EchoJEPA/configs/train  0 volumes  752K
+/l/users/mashrafi.monon/HC701/HC701-Assignment2/pneumonia_data/chest_xray/__MACOSX/chest_xray/train  0 volumes  141M
+/l/users/mashrafi.monon/HC701/HC701-Assignment2/pneumonia_data/chest_xray/chest_xray/train  0 volumes  1.2G
+/l/users/mashrafi.monon/HC701/HC701-Assignment2/pneumonia_data/chest_xray/train  0 volumes  1.2G
+/l/users/mashrafi.monon/LLaVA/src/llava/llava/train  0 volumes  242K
+/l/users/mashrafi.monon/LLaVA/llava/train  0 volumes  415K
+/l/users/mashrafi.monon/MICCAI2026-3DMedVLMS/3D_VLM_Spatial/dataset/data_volumes/dataset/valid_fixed  3039 volumes  447G
+/l/users/mashrafi.monon/MICCAI2026-3DMedVLMS/3D_VLM_Spatial/dataset/data_volumes/dataset/train_fixed  100 volumes  15G
+/l/users/mashrafi.monon/MICCAI2026-3DMedVLMS/benchmarking/inference/vila-m3/repo/m3/train  0 volumes  173K
+/l/users/mashrafi.monon/MICCAI2026-3DMedVLMS/benchmarking/inference/ct-chat/repo/llava/train  0 volumes  4.2M
+/l/users/mashrafi.monon/MICCAI2026-3DMedVLMS/benchmarking/inference/med3dvlm/Med3DVLM/src/train  0 volumes  156K
+/l/users/mashrafi.monon/CV701_A3/imagewoof2-160/train  0 volumes  306M
+-- HF cache entries:
+datasets--ibrahimhamamci--CT-RATE
+models--nvidia--NV-Reason-CT
+-- disk:
+Filesystem        Size  Used Avail Use% Mounted on
+lus-01@tcp:/l     492T  242T  250T  50% /l
+nfs-head:/c/home  482T  221T  262T  46% /home
+
+== 5 NV-Reason-CT code files (no weights)
+snapshot: /home/mashrafi.monon/.cache/huggingface/hub/models--nvidia--NV-Reason-CT/snapshots/386b93e034983f6c1fc841a43833a1b6a0cd9c13
+lab_runs/nvreason_model_code:
+total 6124
+drwxr-xr-x 3 mashrafi.monon students    70656 Nov 11 14:51 .
+drwxr-xr-x 4 mashrafi.monon students    70656 Nov 11 14:47 ..
+-rw-r--r-- 1 mashrafi.monon students     7756 Nov 11 14:51 chat_template.jinja
+-rw-r--r-- 1 mashrafi.monon students     3106 Nov 11 14:51 config.json
+-rw-r--r-- 1 mashrafi.monon students      163 Nov 11 14:51 generation_config.json
+drwxr-xr-x 2 mashrafi.monon students      512 Nov 11 14:51 image_processor_3d
+-rw-r--r-- 1 mashrafi.monon students    10268 Nov 11 14:51 model.py
+-rw-r--r-- 1 mashrafi.monon students      513 Nov 11 14:51 preprocessor_config.json
+-rw-r--r-- 1 mashrafi.monon students    26151 Nov 11 14:51 processor.py
+-rw-r--r-- 1 mashrafi.monon students     1713 Nov 11 14:51 processor_config.json
+-rw-r--r-- 1 mashrafi.monon students      135 Nov 11 14:51 requirements.txt
+-r--r--r-- 1 mashrafi.monon students 19989325 Nov 11 14:51 tokenizer.json
+-rw-r--r-- 1 mashrafi.monon students     1339 Nov 11 14:51 tokenizer_config.json
+-rw-r--r-- 1 mashrafi.monon students      620 Nov 11 14:51 video_preprocessor_config.json
+
+lab_runs/nvreason_model_code/image_processor_3d:
+total 70
+drwxr-xr-x 2 mashrafi.monon students   512 Nov 11 14:51 .
+drwxr-xr-x 3 mashrafi.monon students 70656 Nov 11 14:51 ..
+-rw-r--r-- 1 mashrafi.monon students   238 Nov 11 14:51 preprocessor_config.json
+
+== 6 training libraries in the nvreason env
+torch 2.10.0+cu128
+transformers 5.6.2
+peft MISSING ModuleNotFoundError
+accelerate 1.15.0
+nibabel 5.4.2
+monai 1.6.1
+             JOBID PARTITION     NAME     USER ST       TIME  NODES NODELIST(REASON)
+            291491     ws-ia readout- mashrafi  R       3:48      1 ws-l3-005

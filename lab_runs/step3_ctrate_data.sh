@@ -24,9 +24,9 @@ main() {
       --repo-type dataset --local-dir "$DV" 2>&1 | tail -2
   ls -la "$R" || { echo "train_reports.csv download FAILED"; return 1; }
 
-  echo; echo "== 3 training list (4,000 scans, seed 0)"
+  echo; echo "== 3 training list (3,000 scans ~450 GB, seed 0; quota is 3 TB)"
   $PY finetuning/nvreason_spatial/build_spatial_train_set.py --reports "$R" \
-      --out-dir finetuning/nvreason_spatial/data --max-volumes 4000 || return 1
+      --out-dir finetuning/nvreason_spatial/data --max-volumes 3000 || return 1
 
   echo; echo "== 4 peft into the nvreason env (no deps, so torch/CUDA wheels are not touched)"
   $PY -m pip install -q --no-deps peft 2>&1 | tail -2

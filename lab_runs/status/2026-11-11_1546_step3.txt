@@ -1,0 +1,15 @@
+host ws-l4-021  date Wed Nov 11 15:46:46 +04 2026  hf cli: /home/mashrafi.monon/.local/bin/hf
+
+== 1 quota on /l (stop if under ~800 GB left)
+Disk quotas for usr mashrafi.monon (uid 3152):
+     Filesystem    used  bquota  blimit  bgrace   files  iquota  ilimit  igrace 
+             /l  2.099T      3T   3.15T       -  325107 50000000 52500000       - 
+Invalid user token. The token stored is invalid. Please run `hf auth login` to update it.
+[1m[31m{"error":"Invalid username or password."}[0m
+not logged in to HF (CT-RATE is gated: run 'hf auth login')
+
+== 2 train reports
+Cannot access gated repo for url https://huggingface.co/datasets/ibrahimhamamci/CT-RATE/resolve/main/dataset/radiology_text_reports/train_reports.csv.
+Access to dataset ibrahimhamamci/CT-RATE is restricted. You must have access to it and be authenticated to access it. Please log in.
+ls: cannot access '/l/users/mashrafi.monon/MICCAI2026-3DMedVLMS/3D_VLM_Spatial/dataset/data_volumes/dataset/radiology_text_reports/train_reports.csv': No such file or directory
+train_reports.csv download FAILED

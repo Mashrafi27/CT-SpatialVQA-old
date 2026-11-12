@@ -292,9 +292,9 @@ def cmd_analyse(a) -> None:
     fig.tight_layout()
     fig.savefig(a.out_dir / "overview.png", dpi=120)
     plt.close(fig)
-    print(json.dumps({k: {kk: vv for kk, vv in v.items() if not isinstance(vv, (list, dict))} | {
-        "readout_best": max(v["probe_readout"]), "img_vec_best": max(v["probe_img_vec"].values()),
-        "lens_auc_last": v["lens_auc"][-1]} for k, v in S["axes"].items()}, indent=1))
+    print(json.dumps({k: {**{kk: vv for kk, vv in v.items() if not isinstance(vv, (list, dict))},
+                          "readout_best": max(v["probe_readout"]), "img_vec_best": max(v["probe_img_vec"].values()),
+                          "lens_auc_last": v["lens_auc"][-1]} for k, v in S["axes"].items()}, indent=1))
 
 
 def main() -> None:

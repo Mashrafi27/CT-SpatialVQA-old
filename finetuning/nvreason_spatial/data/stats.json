@@ -1,0 +1,18 @@
+{
+ "ap_A": 914,
+ "ap_B": 963,
+ "items": 3000,
+ "items_flipped": 3000,
+ "left_sided": 4215,
+ "lr_A": 2599,
+ "lr_B": 2706,
+ "ml_A": 654,
+ "ml_B": 1047,
+ "right_sided": 6176,
+ "scans_in_reports": 24128,
+ "scans_one_sided_lr": 10391,
+ "scans_with_spatial_sentences": 20680,
+ "si_A": 2750,
+ "si_B": 2416,
+ "volumes": 3000
+}
